@@ -1,0 +1,7 @@
+{
+  "name": "twitter-partner",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "doublemetaphone": "^0.1.2"
+  }
+}
