@@ -12,7 +12,7 @@ $ python topsites.py
 Some URLs in automatically parsed topsites cannot be reached by http.get() and used as headers. For those problems, I put the string 'not reachable'
 
 
-## Question 3: Phoentic Search
+## Question 3: Phonetic Search
 Prepare a three-slide, five-minute presentation on a technical topic of passionate interest to you. 
 
 Presentation [Slides](http://slides.com/jackchi/metaphone--2)
