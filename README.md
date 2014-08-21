@@ -15,6 +15,7 @@ Some URLs in automatically parsed topsites cannot be reached by http.get() and u
 ## Question 3: Phoentic Search
 Prepare a three-slide, five-minute presentation on a technical topic of passionate interest to you. 
 
+Presentation [Slides](http://slides.com/jackchi/metaphone--2)
 Using [DoubleMetaphone](https://github.com/hgoebl/doublemetaphone) to encode words to phoentic index
 
 
