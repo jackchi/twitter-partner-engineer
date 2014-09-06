@@ -6,4 +6,5 @@
 standard-app-packages
 autopublish
 accounts-twitter
-accounts-ui
+meteorhacks:npm
+npm-container

@@ -4,7 +4,6 @@
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.0.1/mapbox.js'></script>
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.js'></script>
-
 	<link href='https://api.tiles.mapbox.com/mapbox.js/v2.0.1/mapbox.css' rel='stylesheet' />
 	<link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.css' rel='stylesheet' />
 	<!--[if lt IE 9]>
@@ -14,9 +13,7 @@
 
 <body>
 
-	
 	{{> map}}
-	{{> login}}
 	
 	<script>
 		var geojson = [
@@ -169,14 +166,8 @@
 
 		</script>
 	</body>
-	<template name='login'>
-
-		<div class='right'>{{> loginButtons}}</div>
-
-	</template>	
-
+	
 	<template name='map'>
 		<div id='map'>
-			{{start}}	
 		</div>
 	</template>	
