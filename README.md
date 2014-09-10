@@ -30,7 +30,7 @@ Go to http://localhost:3000
 ## Question 3: Phonetic Search
 Prepare a three-slide, five-minute presentation on a technical topic of passionate interest to you. 
 
-Presentation [Slides](http://slides.com/jackchi/metaphone--2)
+Presentation [Slides](http://slides.com/jackchi/metaphone--2/live)
 Using [DoubleMetaphone](https://github.com/hgoebl/doublemetaphone) to encode words to phoentic index
 
 
