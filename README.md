@@ -14,6 +14,8 @@ Some URLs in automatically parsed topsites cannot be reached by http.get() and u
 ## Question 2: Twitter Trends
 Write Code to interact with the Twitter API. 
 
+![TwitterTrendMap](/img/trendmap?raw=true "TrendMap")
+
 * For this portion of the interview challenge, I chose to overlay [Twitter Trends](https://dev.twitter.com/docs/api/1.1) on top of [MapBox](https://www.mapbox.com/mapbox.js/api/v2.1.0/) API on the Browser with [Leaflet](http://leafletjs.com/reference.html) Plugin. 
 * For Authentication I used a Node.js library [OAuth2](https://www.npmjs.org/package/oauth) client-application token authentication
 * However, since most Meteor APIs are executed synchronously to get NPM's package to work in Meteor, we use
@@ -30,7 +32,7 @@ Go to http://localhost:3000
 ## Question 3: Phonetic Search
 Prepare a three-slide, five-minute presentation on a technical topic of passionate interest to you. 
 
-Presentation [Slides](http://slides.com/jackchi/metaphone--2)
+Presentation [Slides](http://slides.com/jackchi/metaphone--2/live)
 Using [DoubleMetaphone](https://github.com/hgoebl/doublemetaphone) to encode words to phoentic index
 
 
