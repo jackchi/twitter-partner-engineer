@@ -13,3 +13,10 @@ body { margin:0; padding:0; }
 .leaflet-control-locate.active a {
   background-position:-33px -2px;
 }
+
+.ui-control {
+  position:absolute;
+  top:10px;
+  left: 44px;
+  z-index:1000;
+  }
