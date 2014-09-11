@@ -19,5 +19,13 @@
 <template name='map'>
 	<div id='map'>
 	</div>
-	<button id='update-trends' class='ui-control'>Update Trends</button>
+	<div class="trends">
+		<span class="city">{{citySelected}}</span>
+		<span class="tags">
+			{{#each SelectedTrends}}
+				<div><a href={{url}} target="_new">{{name}}</a><br></div>
+			{{/each}}
+		</span>	
+	</div>
 </template>	
+

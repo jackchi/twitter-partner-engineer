@@ -1,47 +1,61 @@
 // Shared Mongo Collections
 Places = new Mongo.Collection("places");
-Debug = new Mongo.Collection("debug");
+/**
+ * Globals
+ */
+world = {city: "The World", woeid: "1"};
 
 if (Meteor.isClient) {
-  // avail = Meteor.call("trendAvailable", function(error, results) {
-  //       console.log("ClientAvail: " + results.content); 
-  //   });
 
-  // place = Meteor.call("trendPlace", 1, function(error, results) {
-  //       console.log("ClientPlace: " + results.content); 
-  //   });
+  // Default SelectedMarker is 'The World' ; when no marker is selected
+  Session.setDefault("SelectedMarker", world);
+  Session.setDefault("SelectedTrends", [{name: "", url: ""}]);
 
-  var map = null;
-  var geojson2 = []; 
-  var featureLayer = null;
+  Tracker.autorun(function(){
+    console.log(world);
+    Meteor.call('getTrendPlace', world.woeid, function(error, results) {
+            var trends = [];
+            if(!error){
+              results.data[0].trends.forEach(function(element, index, array) {
+                trends.push({ name: element.name, url: element.url});
+                Session.set("SelectedTrends", trends);
+              });
+            } else {
+              console.log(error);
+            }
+    });
+  });
+
+  Meteor.startup(function() {
+    console.log("dom loaded");
+  });
+
+  Template.registerHelper("SelectedTrends", function() {
+    return Session.get("SelectedTrends");
+  });
 
   Template.map.rendered= function() { 
+    console.log("map rendered");
+
+    /* MapBox Resources*/
+    var map = null;
+    var featureLayer = null;
     L.mapbox.accessToken = 'pk.eyJ1IjoiamFja2NoaSIsImEiOiJtRzZOaVZ3In0.kDJ3_YRuaTSYJAOZW7xR0A';
+
+    /**
+     * [MapBox Object containing our Map] 
+     * @type {[https://www.mapbox.com/mapbox.js/api/v2.1.0/]}
+     * 
+     * Initialzies center to lattitude & longitude with default zoom level and disable continousWorld wrap
+     * Adds the geo-search control button
+     * Adds the geo-locate control button
+     */    
     map = L.mapbox.map('map', 'jackchi.jc0138k5', {center: [25, -20], zoom: 2, tileLayer: {continuousWorld: false}})
       .addControl(L.mapbox.geocoderControl('mapbox.places-v1')); 
-    
-    /*
-      Subscribe to Places collection 
-      Places GeoJson Markers on the Map when Collection is ready
-      Updates Trends of a Place when Marker is clicked
-     */
-    Meteor.subscribe("places", function() {
-      var j = Places.find().map(function(n) { return {geometry: n.geometry, properties: n.properties, type: n.type}});
-      
-      /* Markers - FeatureLayer */
-      featureLayer = L.mapbox.featureLayer()
-        .setGeoJSON(j)
-        .on('click', function(e){
-          console.log(e);
-          console.log(e.layer.feature.properties.title + ":" + e.layer.feature.properties.woeid);
-          map.panTo(e.layer.getLatLng());
-        })
-        .addTo(map);
-      
-    });     
-
-    /* GeoLocation Controls */ 
     L.control.locate({locateOptions:{ maxZoom: 5}}).addTo(map);
+
+    // Geo-Locate Button
+    // TODO: Place Marker / Trends
     map.on("locationfound", function(e){
         console.log(e);
         Meteor.call("getClosest", e.latitude, e.longitude, function(error, results){
@@ -56,13 +70,58 @@ if (Meteor.isClient) {
         console.log(e);
         alert("Location Access Denied");
       });
+
+    /**
+     * Subscribes to 'Places' Mongo Collection 
+     * Async callback when 'Places' is ready():
+     *   - Finds 'Places' Collection
+     *   - Initializes MapBox FeatureLayer
+     */
+    Meteor.subscribe("places", function() {
+      // Extract relevant geoJSON data from Places Mongo Collection
+      var geojson = Places.find().map(function(n) { return { geometry: n.geometry, properties: n.properties, type: n.type}});
+      
+      /**
+       * [FeatureLayer contains our GeoJSON Markers]
+       * @type {[https://www.mapbox.com/mapbox.js/api/v2.1.0/l-mapbox-featurelayer/]}
+       *
+       * Sets GeoJson from extracted 'Places' Collection
+       * Attaches 'click' event to the markers
+       *  - Sets Session 'SelectedMarker' 
+       */
+      featureLayer = L.mapbox.featureLayer()
+        .setGeoJSON(geojson)
+        .on('mouseover', function(e){
+          e.layer.openPopup();
+        })
+        .on('popupclose', function(e){
+          Session.set("SelectedMarker", world);
+        })
+        .on('click', function(e){
+          var cityName = e.layer.feature.properties.title,
+              cityWoeid = e.layer.feature.properties.woeid;
+          Session.set("SelectedMarker", {city: cityName, woeid: cityWoeid});
+          Meteor.call('getTrendPlace', cityWoeid, function(error, results) {
+            var trends = [];
+            if(!error){
+              results.data[0].trends.forEach(function(element, index, array) {
+                trends.push({ name: element.name, url: element.url});
+                Session.set("SelectedTrends", trends);
+              });
+            } else {
+              console.log(error);
+            }
+          });
+          // map.panTo(e.layer.getLatLng());
+        })
+        .addTo(map);
+    });     
   };
 
-  Template.map.events({
-      'click' : function(e) {
-        var updateTrendsHandle = Meteor.call("updateTrends");
-        
-      }
+  Template.map.helpers({
+    citySelected : function() {
+      return Session.get("SelectedMarker").city;
+    }  
   });
 
 }
@@ -320,7 +379,6 @@ if (Meteor.isServer) {
             console.log(element.title + ": "  + result.data[0]);
 
             var description = "<i>last indexed: " + moment(result.data[0].as_of).fromNow() + "</i><br>";
-            
 
             result.data[0].trends.forEach(function(e,i,a) {
               description+="<a href='"+e.url+"' target=new>"+e.name+"</a><br />";
@@ -331,9 +389,6 @@ if (Meteor.isServer) {
                           function(error, docs){
                             if(!error){
                               console.log("Done Updating Places: " + docs);
-                              Meteor.publish("places", function () {
-                                return Places.find();
-                              });
                               return Places.find().fetch();
                             }
                             else
