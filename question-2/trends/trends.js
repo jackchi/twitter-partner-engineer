@@ -5,7 +5,7 @@ Places = new Mongo.Collection("places"); // shared mongo collection
 world = {city: "Worldwide", woeid: "1"}; // worldwide World On Earth ID
 
 if (Meteor.isClient) {
-  
+
   // Default SelectedMarker is 'The World' ; when no marker is selected
   Session.setDefault("SelectedMarker", world);
   Session.setDefault("SelectedTrends", { trends: [{name: "", url: ""}], created_at : ""});
@@ -62,13 +62,52 @@ if (Meteor.isClient) {
       .addControl(L.mapbox.geocoderControl('mapbox.places-v1')); 
     L.control.locate({locateOptions:{ maxZoom: 5}}).addTo(map);
 
+    markerClickevent = function(e){
+          var cityName = e.layer.feature.properties.title,
+              cityWoeid = e.layer.feature.properties.woeid;
+          Session.set("SelectedMarker", {city: cityName, woeid: cityWoeid});
+          Meteor.call('getTrendPlace', cityWoeid, function(error, results) {
+            var trendsArray = [];
+            if(!error){
+              // console.log(results.data[0]);
+              results.data[0].trends.forEach(function(element, index, array) {
+                trendsArray.push({name: element.name, url: element.url});
+              });
+              Session.set("SelectedTrends", {trends : trendsArray, created_at : results.data[0].created_at});
+            } else {
+              console.log(error);
+            }
+            map.panTo(e.layer.getLatLng());
+          });
+    }
+
     // Geo-Locate Button
-    // TODO: Place Marker / Trends
+    // TODO: To fix WOEID to Longitude and Latitude location
     map.on("locationfound", function(e){
         console.log(e);
         Meteor.call("getClosest", e.latitude, e.longitude, function(error, results){
           if(!error){
             console.log(results.data);
+            var j = {
+                      "type": "Feature",
+                      "geometry": {
+                        "type": "Point",
+                        "coordinates": [e.longitude, e.latitude]
+                      },
+                      "properties": {
+                        "title": results.data[0].name,
+                        "description": "",
+                        "woeid": results.data[0].woeid,
+                        "marker-color": "#fc4353",
+                        "marker-size": "large",
+                        "marker-symbol": "city"
+                      }
+                    };
+            L.mapbox.featureLayer(j)
+              .on('click', markerClickevent)
+              .addTo(map);
+            d = Places.insert(j);    
+            console.log(d);
           } else {  
             console.log("Error Retrieving Closest Place: " + error);
           }
@@ -105,26 +144,11 @@ if (Meteor.isClient) {
         .on('popupclose', function(e){
           Session.set("SelectedMarker", world);
         })
-        .on('click', function(e){
-          var cityName = e.layer.feature.properties.title,
-              cityWoeid = e.layer.feature.properties.woeid;
-          Session.set("SelectedMarker", {city: cityName, woeid: cityWoeid});
-          Meteor.call('getTrendPlace', cityWoeid, function(error, results) {
-            var trendsArray = [];
-            if(!error){
-              // console.log(results.data[0]);
-              results.data[0].trends.forEach(function(element, index, array) {
-                trendsArray.push({name: element.name, url: element.url});
-              });
-              Session.set("SelectedTrends", {trends : trendsArray, created_at : results.data[0].created_at});
-            } else {
-              console.log(error);
-            }
-          });
-          map.panTo(e.layer.getLatLng());
-        })
+        .on('click', markerClickevent)
         .addTo(map);
-    });     
+    });  
+
+    
   };
 
 }
@@ -142,6 +166,8 @@ if (Meteor.isServer) {
    * [Places Collection contains GeoJSON Markers]
    * @type {[GeoJSON]} Geographic Data Struction (http://geojson.org/)
    * @type {woeid} Yahoo 32-bit World On Earth ID (https://developer.yahoo.com/geo/geoplanet/guide/concepts.html)
+   *
+   * Note: Coordinate uses [longitude, latitude]
    */
   // TODO: Auto-pubulicate woeid
   // TODO: Auto-publish Places from Twitter's Available API
