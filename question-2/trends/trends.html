@@ -1,6 +1,6 @@
 <head>
 	<meta charset=utf-8 />
-	<title>Twitter Trends</title>
+	<title>Twitter Trends on MapBox</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.0.1/mapbox.js'></script>
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.24.0/L.Control.Locate.js'></script>
@@ -24,7 +24,7 @@
 			<h3>{{citySelected}}</h3>
 			</span>
 		<div class="tag">
-			<i>last updated:</i>{{lastUpdated SelectedTrends.created_at}}
+			<i>last updated:  <b>{{lastUpdated SelectedTrends.created_at}}</b> </i>
 			<ul>
 				{{#each SelectedTrends.trends}}
 				<li><a href={{url}} target="_new">{{name}}</a></li>

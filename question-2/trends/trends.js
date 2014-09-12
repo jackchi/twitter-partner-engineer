@@ -1,13 +1,11 @@
-// Shared Mongo Collections
-Places = new Mongo.Collection("places");
 /**
- * Globals
+ * Global Declarations
  */
-world = {city: "Worldwide", woeid: "1"};
-console.log("hi");
+Places = new Mongo.Collection("places"); // shared mongo collection
+world = {city: "Worldwide", woeid: "1"}; // worldwide World On Earth ID
 
 if (Meteor.isClient) {
-
+  
   // Default SelectedMarker is 'The World' ; when no marker is selected
   Session.setDefault("SelectedMarker", world);
   Session.setDefault("SelectedTrends", { trends: [{name: "", url: ""}], created_at : ""});
@@ -114,7 +112,7 @@ if (Meteor.isClient) {
           Meteor.call('getTrendPlace', cityWoeid, function(error, results) {
             var trendsArray = [];
             if(!error){
-              console.log(results.data[0]);
+              // console.log(results.data[0]);
               results.data[0].trends.forEach(function(element, index, array) {
                 trendsArray.push({name: element.name, url: element.url});
               });
@@ -132,11 +130,21 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-  // OAuth2 Tokens
+  /**
+   * Twitter Application-Only Authentication
+   * https://dev.twitter.com/oauth/application-only
+  */
   var OAuth2 = Meteor.npmRequire('OAuth').OAuth2,
       oauth2 = new OAuth2('oddsxvxeiaQWTj4zwhNn3JJoP', '0ffj8eeImgevD7TlAERGRzVukYo3SdA4jx0zhrqfDpgQYpzaGu', 'https://api.twitter.com/', null, 'oauth2/token', null),
       token = "" ;  
 
+  /**
+   * [Places Collection contains GeoJSON Markers]
+   * @type {[GeoJSON]} Geographic Data Struction (http://geojson.org/)
+   * @type {woeid} Yahoo 32-bit World On Earth ID (https://developer.yahoo.com/geo/geoplanet/guide/concepts.html)
+   */
+  // TODO: Auto-pubulicate woeid
+  // TODO: Auto-publish Places from Twitter's Available API
   if (Places.find({}).fetch().length == 0) {
     Places.insert({
       "type": "Feature",
@@ -220,7 +228,7 @@ if (Meteor.isServer) {
         "coordinates": [ -43.20648193359375, -22.890092534815874]
       }, 
       "properties": {
-        "title": "Jakarta",
+        "title": "Rio de Janiero",
         "woeid":1047378,
         "description": "",
         "marker-color": "#fc4353",
@@ -304,8 +312,9 @@ if (Meteor.isServer) {
       }
     });
   }
+
   /**
-   * 
+   * Grants and Returns Twitter OAuth2 Access Token
    */
   function getToken() {
     var token = Async.runSync(function(done) {
@@ -317,10 +326,9 @@ if (Meteor.isServer) {
   }
 
   Meteor.startup(function() {
-    /* Acquire Client-Application Access Token */
+    /* Acquire Client-Only Application Access Token */
     token = getToken();
-    console.log("Token: "+token);
-
+    
     Meteor.publish("places", function () {
       return Places.find();
     });
@@ -370,7 +378,8 @@ if (Meteor.isServer) {
         });
       return trends.result;
     },
-
+    // TODO: Replaced by marker clicks for individual trend update
+    //@deprecated: ran into problem of rate limit
     'updateTrends' : function() {
       var placesList = Places.find({}).map(function(n) {return { title: n.properties.title, woeid: n.properties.woeid}; });
       placesList.forEach(function(element, index, array) {
@@ -397,8 +406,7 @@ if (Meteor.isServer) {
           } else {
             console.log(error);
             return error;
-          }
-          
+          }      
         });  
       });
     }

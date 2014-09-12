@@ -14,7 +14,7 @@ body {
 .trends {
 	position: absolute;
 	top: 2%;
-	left: 80%;
+	left: 77%;
 	background: rgba(255,255,255,0.85);
 	padding: 0px 5px 25px 5px;
 	margin-bottom: 5px;
@@ -25,7 +25,6 @@ body {
 .trends h3 {
 	font-size: 20px;
 	font-color: #66757F;
-	line-height: 22px;
 }
 .trends a:link, a:visited, a:active{
 	text-decoration: none;
@@ -54,11 +53,9 @@ body {
 .trends .tag li {
 	line-height: 20px;
 }
-
 .right {
 	float: right
 }
-
 .leaflet-control-locate {
   border:1px solid rgba(0,0,0,0.4);
 }
@@ -69,7 +66,6 @@ body {
 .leaflet-control-locate.active a {
   background-position:-33px -2px;
 }
-
 .ui-control {
   position:absolute;
   top:10px;
