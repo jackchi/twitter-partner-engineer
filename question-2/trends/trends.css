@@ -2,25 +2,59 @@
 body { 
 	margin : 0; 
 	padding : 0; 
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 300;
 }
 #map { 
 	position : absolute; 
 	top : 0; 
 	bottom :0;
-	width : 85%; 
+	width: 100%;
 }
-
 .trends {
 	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 85%;
+	top: 2%;
+	left: 80%;
+	background: rgba(255,255,255,0.85);
+	padding: 0px 5px 25px 5px;
+	margin-bottom: 5px;
+	border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
 }
-
+.trends h3 {
+	font-size: 20px;
+	font-color: #66757F;
+	line-height: 22px;
+}
+.trends a:link, a:visited, a:active{
+	text-decoration: none;
+	color: #333;
+}
+.trends a:hover {
+	text-decoration: underline;
+}
 .trends .city {	
 	font-size: 1.5em;
 	font-weight: bold;
+	text-align: center;
+	margin: 5px 2px 0px 3px;
 }
+.trends .tag {
+	margin: 3px 2px 0px 3px;
+	font-size: 10pt;
+}
+.trends .tag ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.trends .tag li {
+	line-height: 20px;
+}
+
 .right {
 	float: right
 }

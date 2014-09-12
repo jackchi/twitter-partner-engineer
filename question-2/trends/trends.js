@@ -3,27 +3,28 @@ Places = new Mongo.Collection("places");
 /**
  * Globals
  */
-world = {city: "The World", woeid: "1"};
+world = {city: "Worldwide", woeid: "1"};
+console.log("hi");
 
 if (Meteor.isClient) {
 
   // Default SelectedMarker is 'The World' ; when no marker is selected
   Session.setDefault("SelectedMarker", world);
-  Session.setDefault("SelectedTrends", [{name: "", url: ""}]);
+  Session.setDefault("SelectedTrends", { trends: [{name: "", url: ""}], created_at : ""});
 
   Tracker.autorun(function(){
-    console.log(world);
+    console.log("autorun");
     Meteor.call('getTrendPlace', world.woeid, function(error, results) {
-            var trends = [];
+            var trendsArray = [];
             if(!error){
               results.data[0].trends.forEach(function(element, index, array) {
-                trends.push({ name: element.name, url: element.url});
-                Session.set("SelectedTrends", trends);
+                trendsArray.push({ name: element.name, url: element.url});
               });
+              Session.set("SelectedTrends", {trends : trendsArray, created_at : results.data[0].created_at});
             } else {
               console.log(error);
             }
-    });
+    });  
   });
 
   Meteor.startup(function() {
@@ -32,6 +33,15 @@ if (Meteor.isClient) {
 
   Template.registerHelper("SelectedTrends", function() {
     return Session.get("SelectedTrends");
+  });
+
+  Template.map.helpers({
+    citySelected : function() {
+      return Session.get("SelectedMarker").city;
+    }, 
+    lastUpdated : function(dateString) {
+      return moment(dateString).fromNow();
+    }  
   });
 
   Template.map.rendered= function() { 
@@ -102,27 +112,22 @@ if (Meteor.isClient) {
               cityWoeid = e.layer.feature.properties.woeid;
           Session.set("SelectedMarker", {city: cityName, woeid: cityWoeid});
           Meteor.call('getTrendPlace', cityWoeid, function(error, results) {
-            var trends = [];
+            var trendsArray = [];
             if(!error){
+              console.log(results.data[0]);
               results.data[0].trends.forEach(function(element, index, array) {
-                trends.push({ name: element.name, url: element.url});
-                Session.set("SelectedTrends", trends);
+                trendsArray.push({name: element.name, url: element.url});
               });
+              Session.set("SelectedTrends", {trends : trendsArray, created_at : results.data[0].created_at});
             } else {
               console.log(error);
             }
           });
-          // map.panTo(e.layer.getLatLng());
+          map.panTo(e.layer.getLatLng());
         })
         .addTo(map);
     });     
   };
-
-  Template.map.helpers({
-    citySelected : function() {
-      return Session.get("SelectedMarker").city;
-    }  
-  });
 
 }
 
@@ -299,11 +304,9 @@ if (Meteor.isServer) {
       }
     });
   }
-
-
-   
-   
-
+  /**
+   * 
+   */
   function getToken() {
     var token = Async.runSync(function(done) {
         oauth2.getOAuthAccessToken('', {'grant_type': 'client_credentials'}, function (err, access_token) {
@@ -318,9 +321,6 @@ if (Meteor.isServer) {
     token = getToken();
     console.log("Token: "+token);
 
-    /* Update Trends In Our Places*/  
-    // var trendsPlacesHandle = Meteor.call('updateTrends');
-    
     Meteor.publish("places", function () {
       return Places.find();
     });

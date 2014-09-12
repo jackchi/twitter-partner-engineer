@@ -20,12 +20,17 @@
 	<div id='map'>
 	</div>
 	<div class="trends">
-		<span class="city">{{citySelected}}</span>
-		<span class="tags">
-			{{#each SelectedTrends}}
-				<div><a href={{url}} target="_new">{{name}}</a><br></div>
-			{{/each}}
-		</span>	
+		<span class="city">
+			<h3>{{citySelected}}</h3>
+			</span>
+		<div class="tag">
+			<i>last updated:</i>{{lastUpdated SelectedTrends.created_at}}
+			<ul>
+				{{#each SelectedTrends.trends}}
+				<li><a href={{url}} target="_new">{{name}}</a></li>
+				{{/each}}
+			</ul>
+		</div>			
 	</div>
 </template>	
 
