@@ -8,4 +8,5 @@ accounts-twitter
 meteorhacks:npm
 npm-container
 mrt:moment
+insecure
 
